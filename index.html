@@ -446,7 +446,7 @@ input,textarea{font:inherit;color:inherit}
       next: 'A', history: [],
       body: [],            // [{at, kg}] — bodyweight log, always stored in kg
       heightCm: 175,
-      restNormal: 90, restFail: 300,
+      restNormal: 90, restFail: 300, keepAwake: true,
       theme: 'auto', setup: false, step: 0, experienced: false,
       view: 'today', session: null, last: null,
       showTable: false, openCue: null, calMonth: null, calPick: null,
@@ -621,6 +621,54 @@ input,textarea{font:inherit;color:inherit}
     fill.style.width = (over ? 100 : Math.max(0, 100 - (left / rest.dur) * 100)) + '%';
     if (cap) cap.textContent = over ? 'Rested — go' : 'Resting';
   }, 250);
+
+  /* ==========================================================================
+     6b. Screen wake lock — hold the screen on, but only during a workout
+     ========================================================================== */
+
+  // 'off' | 'on' | 'failed' | 'unsupported'
+  var wake = { lock: null, state: 'off', busy: false };
+  var WAKE_OK = (function () { try { return 'wakeLock' in navigator; } catch (e) { return false; } })();
+
+  function wakeSet(s) {
+    if (wake.state !== s) { wake.state = s; render(); }
+  }
+
+  function wakeRelease() {
+    var l = wake.lock;
+    wake.lock = null;
+    if (l) { try { l.release(); } catch (e) {} }
+    wakeSet('off');
+  }
+
+  function wakeApply() {
+    if (!WAKE_OK) { wake.state = 'unsupported'; return; }
+    // only while actually training, and only while the app is on screen
+    var want = !!state.keepAwake && state.view === 'workout' && document.visibilityState === 'visible';
+    if (!want) { if (wake.lock || wake.state === 'on' || wake.state === 'failed') wakeRelease(); return; }
+    if (wake.lock || wake.busy) return;
+
+    wake.busy = true;
+    navigator.wakeLock.request('screen').then(function (l) {
+      wake.busy = false;
+      // the OS drops it on backgrounding or screen-off; reflect that honestly
+      l.addEventListener('release', function () {
+        if (wake.lock === l) { wake.lock = null; wakeSet('off'); }
+      });
+      if (state.view !== 'workout' || !state.keepAwake) { try { l.release(); } catch (e) {} return; }
+      wake.lock = l;
+      wakeSet('on');
+    }, function () {
+      // Low Power Mode / battery saver refuses the request — say so rather than lie
+      wake.busy = false;
+      wakeSet('failed');
+    });
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') wakeApply();
+    else if (wake.lock) { wake.lock = null; wakeSet('off'); }
+  });
 
   /* ==========================================================================
      7. Shared view helpers
@@ -900,9 +948,16 @@ input,textarea{font:inherit;color:inherit}
           (state.armFinish ? 'Finish anyway &middot; ' + open + ' unlogged' : 'Finish workout') + '</button>' +
       '</div></div>';
 
+    var awakeNote = wake.state === 'on'
+      ? ' The screen stays on while this workout is open.'
+      : wake.state === 'failed'
+      ? ' <strong style="color:var(--warn)">Could not keep the screen on</strong> — Low Power Mode blocks it.'
+      : '';
+
     return '<div class="body"><div class="pad">' + cards +
       '<p class="hint">Rest ' + mmss(state.restNormal) + ' between sets, ' + mmss(state.restFail) +
-      ' if a set was hard or you missed reps. Sitting down and waiting is part of the program.</p>' +
+      ' if a set was hard or you missed reps. Sitting down and waiting is part of the program.' +
+      awakeNote + '</p>' +
       '</div></div>' + dock;
   }
 
@@ -1240,6 +1295,18 @@ input,textarea{font:inherit;color:inherit}
       '<div class="field"><div class="between"><span class="fname">Rest after a hard set</span>' +
         stepperHTML('rest', 'fail', fmt(state.restFail / 60), 'min') + '</div></div>' +
 
+      '<div class="field"><div class="between"><span class="fname">Keep the screen awake</span>' +
+        (WAKE_OK
+          ? '<div class="seg" role="group" aria-label="Keep the screen awake">' +
+            '<button data-act="awake" data-v="1" aria-pressed="' + (!!state.keepAwake) + '">On</button>' +
+            '<button data-act="awake" data-v="0" aria-pressed="' + (!state.keepAwake) + '">Off</button>' +
+            '</div>'
+          : '<span class="pill">Not supported</span>') +
+        '</div><p class="fsub">' + (WAKE_OK
+          ? 'Stops the screen dimming between sets. Only while a workout is open, so it will not sit there draining the battery.'
+          : 'This browser cannot hold the screen on. On iPhone it needs iOS 16.4 or newer.') +
+        '</p></div>' +
+
       '<div class="field"><div class="between"><span class="fname">Appearance</span>' +
         '<div class="seg" role="group" aria-label="Appearance">' +
         '<button data-act="theme" data-v="auto" aria-pressed="' + (state.theme === 'auto') + '">Auto</button>' +
@@ -1339,6 +1406,7 @@ input,textarea{font:inherit;color:inherit}
     var nowSheet = app.querySelector('.sheet');
     if (nowSheet && keepSheet) nowSheet.scrollTop = keepSheet;
     wireSparks();
+    wakeApply();
   }
 
   /* ==========================================================================
@@ -1578,6 +1646,7 @@ input,textarea{font:inherit;color:inherit}
       state[k] = Math.max(30, state[k] - 30);
     },
     theme: function (d) { state.theme = d.v; },
+    awake: function (d) { state.keepAwake = d.v === '1'; },
 
     export: function () { doExport(); },
     copy: function () { doCopy(); },
