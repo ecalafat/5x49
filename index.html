@@ -128,9 +128,9 @@ input,textarea{font:inherit;color:inherit}
 .pad{padding:18px 18px 26px;display:grid;gap:16px}
 .pad>*{min-width:0}
 
-.tabs{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);
+.tabs{flex:0 0 auto;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);
   background:var(--ground);padding-bottom:env(safe-area-inset-bottom)}
-.tab{padding:13px 2px 15px;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.11em;
+.tab{padding:13px 1px 15px;font-family:var(--f-mono);font-size:9px;letter-spacing:.07em;
   text-transform:uppercase;color:var(--ink3);border-top:2px solid transparent;margin-top:-1px;text-align:center}
 .tab[aria-current="page"]{color:var(--ink);border-top-color:var(--accent-solid)}
 
@@ -283,6 +283,54 @@ input,textarea{font:inherit;color:inherit}
 .empty b{font-family:var(--f-num);font-size:25px;text-transform:uppercase;color:var(--ink2);
   letter-spacing:.03em;font-weight:400}
 .empty p{margin:0;font-size:13px;line-height:1.55;max-width:30ch}
+
+/* ============ weight ============ */
+.bwhero{display:grid;gap:0;padding:22px 18px 14px}
+.bwhero .big{font-family:var(--f-num);font-size:66px;line-height:.8;letter-spacing:.01em;
+  font-variant-numeric:tabular-nums}
+.bwhero .big small{font-family:var(--f-mono);font-size:13px;letter-spacing:.06em;color:var(--ink3);
+  margin-left:5px;vertical-align:10px}
+.bwhero .meta{margin-top:11px;display:flex;gap:7px;flex-wrap:wrap}
+
+/* the one place in the app you type a number rather than tap it up */
+.numin{width:100%;min-width:0;background:var(--sunk);border:1px solid var(--line2);border-radius:11px;
+  padding:9px 6px 7px;font-family:var(--f-num);font-size:30px;line-height:1.1;letter-spacing:.01em;
+  text-align:center;font-variant-numeric:tabular-nums;appearance:textfield;-moz-appearance:textfield}
+.numin::-webkit-outer-spin-button,.numin::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.textin{width:100%;min-width:0;background:var(--sunk);border:1px solid var(--line2);border-radius:10px;
+  padding:10px 12px;font-family:var(--f-mono);font-size:13px;letter-spacing:.03em}
+.numrow{display:grid;grid-template-columns:46px minmax(0,1fr) 46px;gap:8px;align-items:stretch}
+.numrow button{border:1px solid var(--line2);border-radius:11px;display:grid;place-items:center;
+  font-family:var(--f-mono);font-size:19px;color:var(--ink2)}
+.numrow button:hover{background:var(--surface2);color:var(--ink)}
+.numrow button:active{transform:scale(.95)}
+
+.chart{position:relative;margin-top:2px}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.clegend{display:flex;gap:13px;margin-top:11px;flex-wrap:wrap}
+.clegend span{display:flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:9.5px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.clegend i{width:15px;height:0;border-top:2px solid var(--accent-solid);flex:0 0 auto}
+.clegend i.raw{width:8px;height:8px;border:0;border-radius:99px;background:var(--ink3);opacity:.7}
+.clegend i.goal{border-top:2px dashed var(--good)}
+.seg.sm button{padding:6px 9px;font-size:10px;letter-spacing:.06em}
+
+.erow{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:10px;align-items:center;
+  padding:9px 0;border-bottom:1px solid var(--line)}
+.erow:last-child{border-bottom:none;padding-bottom:0}
+.erow .ed{font-family:var(--f-mono);font-size:11.5px;color:var(--ink2);letter-spacing:.04em}
+.erow .ed b{color:var(--ink);font-weight:600}
+.erow .ev{font-family:var(--f-num);font-size:22px;line-height:1;font-variant-numeric:tabular-nums}
+.erow .ev small{font-family:var(--f-mono);font-size:9.5px;color:var(--ink3);margin-left:3px;vertical-align:2px}
+.erow .dl{font-family:var(--f-mono);font-size:10px;color:var(--ink3);width:44px;text-align:right;
+  font-variant-numeric:tabular-nums}
+.erow .del{width:28px;height:28px;display:grid;place-items:center;border-radius:8px;color:var(--ink3)}
+.erow .del:hover{background:var(--surface2);color:var(--bad)}
+
+.tipbox{border:1px dashed var(--line2);border-radius:12px;padding:11px 13px}
+.tipbox b{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);display:block;margin-bottom:4px}
+.tipbox p{margin:0;font-size:12.5px;color:var(--ink2);line-height:1.55}
 
 /* ============ guide / prose ============ */
 .prose h2{font-family:var(--f-num);font-size:25px;line-height:1.04;text-transform:uppercase;
@@ -445,8 +493,11 @@ input,textarea{font:inherit;color:inherit}
       weights: w, stalls: f,
       next: 'A', history: [],
       body: [],            // [{at, kg}] — bodyweight log, always stored in kg
+      goalKg: null,        // goal bodyweight in kg, or null — a floor or a ceiling on the chart
+      wRange: 90,          // days of bodyweight chart on screen; 0 = the whole log
       heightCm: 175,
       restNormal: 90, restFail: 300, keepAwake: true,
+      waNumber: '',        // where the recap goes — digits only, no plus
       theme: 'auto', setup: false, step: 0, experienced: false,
       view: 'today', session: null, last: null,
       showTable: false, openCue: null, calMonth: null, calPick: null,
@@ -555,6 +606,16 @@ input,textarea{font:inherit;color:inherit}
   }
   function monthKey(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2); }
 
+  // Whole local days since the epoch. The bodyweight chart is drawn in this unit so
+  // that a week you did not weigh in shows up as a gap rather than being squeezed out.
+  function dnum(ts) {
+    var d = new Date(ts); d.setHours(0, 0, 0, 0);
+    return Math.round(d.getTime() / 86400000);
+  }
+  function shortDate(ts) {
+    return new Date(ts).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  }
+
   // date -> the session logged that day (last one wins if two)
   function byDay() {
     var m = {};
@@ -573,11 +634,54 @@ input,textarea{font:inherit;color:inherit}
   function bodyNow() {
     return state.body.length ? state.body[state.body.length - 1].kg : null;
   }
+  // One reading per day, oldest first. Weighing twice in a day overwrites, it does not stack.
   function logBody(kg) {
     kg = Math.round(kg * 10) / 10;
-    var k = dkey(Date.now()), last = state.body[state.body.length - 1];
-    if (last && dkey(last.at) === k) last.kg = kg;
-    else state.body.push({ at: Date.now(), kg: kg });
+    if (!(kg > 0)) return;
+    var k = dkey(Date.now());
+    for (var i = state.body.length - 1; i >= 0; i--) {
+      if (dkey(state.body[i].at) === k) { state.body[i].kg = kg; return; }
+    }
+    state.body.push({ at: Date.now(), kg: kg });
+    state.body.sort(function (a, b) { return a.at - b.at; });
+  }
+  function bodyOn(ts) {
+    var k = dkey(ts);
+    for (var i = state.body.length - 1; i >= 0; i--) {
+      if (dkey(state.body[i].at) === k) return state.body[i].kg;
+    }
+    return null;
+  }
+  function bodyToday() { return bodyOn(Date.now()); }
+  function dropBody(key) {
+    state.body = state.body.filter(function (e) { return dkey(e.at) !== key; });
+  }
+
+  // Every reading with its own 7-day trailing average. The daily number is mostly water;
+  // the average is the part that actually means something.
+  function bodyTrend() {
+    var e = state.body.slice().sort(function (a, b) { return a.at - b.at; });
+    return e.map(function (p, i) {
+      var d = dnum(p.at), sum = 0, n = 0;
+      for (var j = i; j >= 0; j--) {
+        if (d - dnum(e[j].at) > 6) break;
+        sum += e[j].kg; n++;
+      }
+      return { at: p.at, d: d, kg: p.kg, avg: sum / n, n: n };
+    });
+  }
+  // Where the trend stood on a given day, or null if the log had not started yet.
+  function trendAt(trend, day) {
+    for (var i = trend.length - 1; i >= 0; i--) if (trend[i].d <= day) return trend[i];
+    return null;
+  }
+  // A goal below you is a floor you are heading down to; above you it is a ceiling.
+  function goalSide() {
+    var t = bodyTrend();
+    if (state.goalKg === null || !t.length) return null;
+    var now = t[t.length - 1].avg;
+    if (Math.abs(state.goalKg - now) < 0.05) return 'at';
+    return state.goalKg < now ? 'floor' : 'ceiling';
   }
   function bmi() {
     var kg = bodyNow();
@@ -727,9 +831,96 @@ input,textarea{font:inherit;color:inherit}
       (unit ? '<small>' + unit + '</small>' : '') + '</div><span class="k lbl">' + k + '</span></div>';
   }
 
+  /* ==========================================================================
+     7b. The recap — one session as plain text, headed for WhatsApp
+     ========================================================================== */
+
+  // Tonnage in the units the session was logged in, not whatever the switch says today.
+  function compactIn(load, u) {
+    var big = u === 'kg' ? 1000 : 2000;
+    if (load < big) return fmt(Math.round(load)) + ' ' + u;
+    return fmt(Math.round(load / big * 10) / 10) + (u === 'kg' ? ' t' : ' ton');
+  }
+
+  function recapText(rec) {
+    var u = rec.units || U(), reps = 0, load = 0, up = 0;
+    rec.lifts.forEach(function (e) {
+      e.sets.forEach(function (r) { if (r) { reps += r; load += r * e.weight; } });
+      if (e.kind === 'up') up++;
+    });
+
+    var lines = ['🏋 5×4.9 · Workout ' + rec.workout + ' · ' + dayName(rec.at), ''];
+
+    rec.lifts.forEach(function (e) {
+      var mark = e.kind === 'up' ? ' ✅'
+        : e.kind === 'down' ? ' ↓ deload'
+        : e.kind === 'hold' ? ' ↺ repeat' : '';
+      lines.push(LIFTS[e.id].name + ' — ' + fmt(e.weight) + u + ' · ' +
+        e.sets.map(function (r) { return r === null ? '–' : r; }).join('/') + mark);
+    });
+
+    lines.push('');
+    lines.push(reps + ' reps · ' + compactIn(load, u) + ' moved · ' +
+      up + ' of ' + rec.lifts.length + ' lift' + (rec.lifts.length === 1 ? '' : 's') + ' go up next time');
+
+    var bw = bodyOn(rec.at);
+    if (bw !== null) lines.push('Bodyweight ' + fmt(Math.round(toDisplayWeight(bw) * 10) / 10) + ' ' + U());
+
+    var other = rec.workout === 'A' ? 'B' : 'A';
+    lines.push('Next up: workout ' + other + ' — ' +
+      PLAN[other].map(function (i) { return LIFTS[i].name; }).join(', '));
+
+    return lines.join('\n');
+  }
+
+  function waDigits() { return String(state.waNumber || '').replace(/[^0-9]/g, ''); }
+
+  function openLink(url) {
+    try {
+      var w = window.open(url, '_blank');
+      if (!w) location.href = url;
+    } catch (e) {
+      try { location.href = url; } catch (e2) {}
+    }
+  }
+
+  // With a number saved this lands straight in that chat. Without one the system share
+  // sheet is the better door — WhatsApp sits in it along with everything else.
+  function shareRecap(rec) {
+    if (!rec) return;
+    var text = recapText(rec), num = waDigits();
+
+    if (!num && navigator.share) {
+      setStatus('Pick WhatsApp in the share sheet…');
+      navigator.share({ text: text }).then(function () {
+        setStatus('Recap sent.'); render();
+      }, function (err) {
+        if (err && err.name === 'AbortError') { setStatus(''); render(); return; }
+        openLink('https://wa.me/?text=' + encodeURIComponent(text));
+      });
+      return;
+    }
+    setStatus('Opening WhatsApp…');
+    openLink('https://wa.me/' + num + '?text=' + encodeURIComponent(text));
+  }
+
+  function copyRecap(rec) {
+    if (!rec) return;
+    var text = recapText(rec);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { setStatus('Recap copied — paste it anywhere.'); render(); },
+        function () { setStatus('Could not copy it here.', true); render(); });
+    } else {
+      setStatus('Copying is not available here.', true);
+    }
+  }
+
   var GEAR = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.11-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 5.1 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 8.9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V10a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>';
   var CROSS = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg>';
   var BACK = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>';
+  var TRASH = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>';
+  var SHARE = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path><path d="M12 3v12M8 7l4-4 4 4"></path></svg>';
   var PREV = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>';
   var NEXT = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>';
 
@@ -1000,9 +1191,41 @@ input,textarea{font:inherit;color:inherit}
           : rec.lifts.some(function (e) { return e.kind === 'hold'; })
           ? '<div class="banner"><p><strong>One lift stays put.</strong> Repeat the same weight next time. ' +
             'Eat properly and sleep — most missed reps are a recovery problem, not a strength problem.</p></div>' : '') +
+        shareCard(rec) +
         '<button class="btn" data-act="go-today">Done</button>' +
         '<button class="btn ghost" data-act="go-calendar">See the calendar</button>' +
       '</div></div>';
+  }
+
+  /* ==========================================================================
+     11b. Share the recap
+     ========================================================================== */
+
+  function shareCard(rec) {
+    var num = waDigits();
+    var st = ui.status
+      ? '<p class="status' + (ui.statusErr ? ' err' : '') + '" style="margin-top:8px">' + ui.status + '</p>' : '';
+
+    return '<div class="card">' +
+      '<p class="lbl" style="margin:0 0 8px">Tell someone</p>' +
+      '<button class="btn" data-act="share" data-id="' + dkey(rec.at) + '">' + SHARE +
+        (num ? 'Send the recap' : 'Share the recap') + '</button>' +
+      '<p class="hint" style="margin:9px 0 0">' + (num
+        ? 'Opens WhatsApp straight at ' + waPretty() + ' with every lift, every set and the ' +
+          'weight on the bar already typed out. You still press send.'
+        : 'Every lift, every set and the weight on the bar, as a message you can drop into ' +
+          'WhatsApp. Put a number in Settings and it goes straight to that chat.') + '</p>' +
+      '<div style="display:flex;gap:8px;margin-top:11px">' +
+        '<button class="btn ghost sm" style="flex:1" data-act="copy-recap" data-id="' + dkey(rec.at) + '">Copy text</button>' +
+        (num ? '' : '<button class="btn ghost sm" style="flex:1" data-act="settings">Set a number</button>') +
+      '</div>' + st +
+    '</div>';
+  }
+
+  // The saved number, spaced out enough to recognise without being a privacy leak.
+  function waPretty() {
+    var d = waDigits();
+    return d ? '+' + d.replace(/(\d{1,3})(?=(\d{3})+$)/g, '$1 ') : '';
   }
 
   /* ==========================================================================
@@ -1048,6 +1271,10 @@ input,textarea{font:inherit;color:inherit}
               '<div class="sc">' + e.sets.map(function (r) { return r === null ? '-' : r; }).join(' / ') + '</div></div>' +
             '<div class="wt">' + fmt(e.weight) + '<small>' + picked.units + '</small></div></div>';
         }).join('') +
+        '<button class="btn ghost sm" style="width:100%;margin-top:12px" data-act="share" ' +
+          'data-id="' + state.calPick + '">' + SHARE + 'Share this one</button>' +
+        (ui.status ? '<p class="status' + (ui.statusErr ? ' err' : '') +
+          '" style="margin-top:8px">' + ui.status + '</p>' : '') +
       '</div>';
     }
 
@@ -1116,7 +1343,6 @@ input,textarea{font:inherit;color:inherit}
   function bodyCard() {
     var kg = bodyNow();
     var b = bmi();
-    var disp = fmt(Math.round(toDisplayWeight(kg === null ? 75 : kg) * 2) / 2);
     var ratios = state.history.length && kg ? ORDER.filter(function (id) {
       return series(id).length;
     }).map(function (id) {
@@ -1129,9 +1355,17 @@ input,textarea{font:inherit;color:inherit}
       '<div class="between"><div><div class="fname" style="font-size:14.5px;font-weight:600">Bodyweight</div>' +
         '<div class="fsub" style="font-size:12.5px;color:var(--ink3)">' + heightText() +
         (b ? ' &middot; BMI ' + b : '') + '</div></div>' +
-        stepperHTML('bw', 'bw', disp, U()) + '</div>' +
+        '<div style="text-align:right">' +
+          (kg === null
+            ? '<span class="pill">Not logged</span>'
+            : '<div class="wbig" style="font-size:34px">' +
+              fmt(Math.round(toDisplayWeight(kg) * 10) / 10) + '<small>' + U() + '</small></div>') +
+        '</div>' +
+      '</div>' +
       (ratios ? '<div style="margin-top:14px"><p class="lbl" style="margin:0 0 2px">Relative to bodyweight</p>' +
         ratios + '</div>' : '') +
+      '<button class="btn ghost sm" style="width:100%;margin-top:13px" data-act="nav" data-v="weight">' +
+        (kg === null ? 'Start the weight log' : 'Weight log &amp; trend') + '</button>' +
     '</div>';
   }
 
@@ -1192,6 +1426,269 @@ input,textarea{font:inherit;color:inherit}
       '</div>' + bodyCard() + cards +
       '<button class="btn ghost" data-act="table">' + (state.showTable ? 'Hide the numbers' : 'Show the numbers') + '</button>' +
       table + '</div></div>';
+  }
+
+  /* ==========================================================================
+     13b. Weight — a reading a day, and the trend underneath the noise
+     ========================================================================== */
+
+  // Daily readings as dots, the 7-day average as the line, and the goal as a dashed
+  // floor or ceiling with the far side of it shaded out of bounds.
+  function bwChartSVG(pts, goal, side) {
+    var W = 300, H = 130, PL = 28, PR = 8, PT = 11, PB = 19;
+    if (!pts.length) return '';
+
+    var vals = [];
+    pts.forEach(function (p) { vals.push(p.v); vals.push(p.avg); });
+    if (goal !== null) vals.push(goal);
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    var pad = (hi - lo) * 0.14 || 1;
+    lo -= pad; hi += pad;
+
+    var d0 = pts[0].d, d1 = pts[pts.length - 1].d, mid = PL + (W - PL - PR) / 2;
+    var x = function (d) {
+      return d1 === d0 ? mid : PL + ((d - d0) / (d1 - d0)) * (W - PL - PR);
+    };
+    var y = function (v) { return PT + (1 - (v - lo) / (hi - lo)) * (H - PT - PB); };
+    var f1 = function (v) { return (Math.round(v * 10) / 10).toFixed(1); };
+
+    var out = [];
+
+    // goal, as a band you are not meant to be in plus the line itself
+    if (goal !== null) {
+      var gy = y(goal);
+      if (side === 'floor') {
+        out.push('<rect x="' + PL + '" y="' + gy.toFixed(1) + '" width="' + (W - PL - PR) +
+          '" height="' + Math.max(0, H - PB - gy).toFixed(1) + '" fill="var(--good)" opacity="0.09"></rect>');
+      } else if (side === 'ceiling') {
+        out.push('<rect x="' + PL + '" y="' + PT + '" width="' + (W - PL - PR) +
+          '" height="' + Math.max(0, gy - PT).toFixed(1) + '" fill="var(--good)" opacity="0.09"></rect>');
+      }
+      out.push('<line x1="' + PL + '" y1="' + gy.toFixed(1) + '" x2="' + (W - PR) + '" y2="' + gy.toFixed(1) +
+        '" stroke="var(--good)" stroke-width="1.6" stroke-dasharray="5 4"></line>');
+    }
+
+    // axes
+    out.push('<line x1="' + PL + '" y1="' + (H - PB) + '" x2="' + (W - PR) + '" y2="' + (H - PB) +
+      '" stroke="var(--line)" stroke-width="1"></line>');
+
+    // the daily readings: a faint thread with a dot on every day you stood on the scale
+    if (pts.length > 1) {
+      out.push('<path d="' + pts.map(function (p, i) {
+        return (i ? 'L' : 'M') + x(p.d).toFixed(1) + ' ' + y(p.v).toFixed(1);
+      }).join(' ') + '" fill="none" stroke="var(--ink3)" stroke-width="1" opacity="0.34"></path>');
+    }
+    pts.forEach(function (p) {
+      out.push('<circle cx="' + x(p.d).toFixed(1) + '" cy="' + y(p.v).toFixed(1) +
+        '" r="1.9" fill="var(--ink3)" opacity="0.75"></circle>');
+    });
+
+    // the 7-day average: the line that actually tells you which way you are going
+    if (pts.length > 1) {
+      out.push('<path d="' + pts.map(function (p, i) {
+        return (i ? 'L' : 'M') + x(p.d).toFixed(1) + ' ' + y(p.avg).toFixed(1);
+      }).join(' ') + '" fill="none" stroke="var(--accent-solid)" stroke-width="2" ' +
+        'stroke-linecap="round" stroke-linejoin="round"></path>');
+    }
+    var last = pts[pts.length - 1];
+    out.push('<circle cx="' + x(last.d).toFixed(1) + '" cy="' + y(last.avg).toFixed(1) +
+      '" r="4.2" fill="var(--accent-solid)" stroke="var(--surface)" stroke-width="2"></circle>');
+
+    // left-hand labels, goal first, then whatever still has room
+    var marks = [];
+    if (goal !== null) marks.push({ y: y(goal), t: f1(goal), c: 'var(--good)' });
+    var dhi = Math.max.apply(null, pts.map(function (p) { return p.v; }));
+    var dlo = Math.min.apply(null, pts.map(function (p) { return p.v; }));
+    marks.push({ y: y(dhi), t: f1(dhi), c: 'var(--ink3)' });
+    if (Math.abs(dhi - dlo) > 1e-9) marks.push({ y: y(dlo), t: f1(dlo), c: 'var(--ink3)' });
+    var kept = [];
+    marks.forEach(function (m) {
+      for (var i = 0; i < kept.length; i++) if (Math.abs(kept[i].y - m.y) < 12) return;
+      kept.push(m);
+      out.push('<text x="' + (PL - 5) + '" y="' + (m.y + 3.2).toFixed(1) + '" text-anchor="end" ' +
+        'fill="' + m.c + '" font-family="ui-monospace,monospace" font-size="8.5">' + m.t + '</text>');
+    });
+
+    // dates along the bottom
+    out.push('<text x="' + PL + '" y="' + (H - 6) + '" fill="var(--ink3)" ' +
+      'font-family="ui-monospace,monospace" font-size="8.5">' + shortDate(pts[0].at) + '</text>');
+    if (pts.length > 1) {
+      out.push('<text x="' + (W - PR) + '" y="' + (H - 6) + '" text-anchor="end" fill="var(--ink3)" ' +
+        'font-family="ui-monospace,monospace" font-size="8.5">' + shortDate(last.at) + '</text>');
+    }
+
+    out.push('<line class="xhair" x1="0" y1="' + PT + '" x2="0" y2="' + (H - PB) +
+      '" stroke="var(--ink3)" stroke-width="1" opacity="0"></line>');
+
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Bodyweight and its ' +
+      'seven-day average over time; the readings are listed below">' + out.join('') + '</svg>';
+  }
+
+  function bwPill(delta, label) {
+    if (delta === null) return '';
+    var d = Math.round(delta * 10) / 10;
+    var side = goalSide(), cls = 'pill';
+    // Down is only good if the goal is below you — otherwise leave it uncoloured.
+    if (side === 'floor') cls = 'pill ' + (d < -0.05 ? 'up' : d > 0.05 ? 'down' : 'hold');
+    else if (side === 'ceiling') cls = 'pill ' + (d > 0.05 ? 'up' : d < -0.05 ? 'down' : 'hold');
+    var arrow = d > 0.05 ? '↑' : d < -0.05 ? '↓' : '→';
+    return '<span class="' + cls + '">' + arrow + ' ' + fmt(Math.abs(d)) + ' ' + U() + ' ' + label + '</span>';
+  }
+
+  function screenWeight() {
+    var trend = bodyTrend();
+    var today = bodyToday();
+    var disp = function (kg) { return Math.round(toDisplayWeight(kg) * 10) / 10; };
+    var step = U() === 'kg' ? 0.1 : 0.2;
+
+    // What sits in the box: your draft if you are typing, else today's reading,
+    // else the last one you logged as a starting point.
+    var seed = today !== null ? today : (bodyNow() === null ? 75 : bodyNow());
+    var draft = ui.wDraft === null || ui.wDraft === undefined
+      ? fmt(disp(seed)) : ui.wDraft;
+
+    var goalDisp = state.goalKg === null ? null : disp(state.goalKg);
+    var side = goalSide();
+
+    /* ---- the box you type into, and the tip that makes the number worth trusting ---- */
+    var st = ui.status
+      ? '<p class="status' + (ui.statusErr ? ' err' : '') + '" style="margin-top:9px">' + ui.status + '</p>' : '';
+
+    var entry = '<div class="card">' +
+      '<div class="between" style="margin-bottom:10px">' +
+        '<p class="lbl" style="margin:0">Today &middot; ' + shortDate(Date.now()) + '</p>' +
+        (today !== null ? '<span class="pill up">Logged</span>' : '<span class="pill">Not yet</span>') +
+      '</div>' +
+      '<div class="numrow">' +
+        '<button data-act="wt-down" aria-label="Less">&minus;</button>' +
+        '<input class="numin" id="wtIn" type="number" step="' + step + '" min="20" max="400" ' +
+          'inputmode="decimal" value="' + draft + '" aria-label="Weight today in ' + U() + '">' +
+        '<button data-act="wt-up" aria-label="More">+</button>' +
+      '</div>' +
+      '<button class="btn" style="margin-top:11px" data-act="wt-save">' +
+        (today !== null ? 'Update today' : 'Log it') + '</button>' + st +
+      '<div class="tipbox" style="margin-top:13px"><b>Make it comparable</b>' +
+        '<p>Weigh yourself every day at the same time — ideally right after waking up and ' +
+        'going to the bathroom, before eating or drinking. A single reading swings a kilo or two ' +
+        'on salt and water alone, which is exactly why the line to watch is the 7-day average.</p></div>' +
+    '</div>';
+
+    if (!state.body.length) {
+      return '<div class="body"><div class="pad">' +
+        '<div class="wiz"><h2>Stand on the<br>scale daily</h2>' +
+        '<p class="lead">One reading a day. Any single one of them is mostly water — it is the ' +
+        '7-day average underneath that tells you which way you are actually going.</p></div>' +
+        entry +
+        '<div class="empty"><b>No readings yet</b>' +
+        '<p>Log today, then tomorrow. The trend line needs about a week before it means ' +
+        'anything, and after that it is the only number worth reading.</p></div>' +
+        '</div></div>';
+    }
+
+    /* ---- hero ---- */
+    var latest = trend[trend.length - 1];
+    var wk = trendAt(trend, latest.d - 7), mo = trendAt(trend, latest.d - 30);
+    var dWeek = wk && wk !== latest ? disp(latest.avg) - disp(wk.avg) : null;
+    var dMonth = mo && mo !== latest ? disp(latest.avg) - disp(mo.avg) : null;
+
+    var hero = '<div class="bwhero">' +
+      '<div class="big">' + fmt(disp(latest.kg)) + '<small>' + U() + '</small></div>' +
+      '<div class="meta">' +
+        '<span class="pill">7-day avg ' + fmt(disp(latest.avg)) + ' ' + U() + '</span>' +
+        (dWeek !== null ? bwPill(dWeek, 'in a week') : '') +
+        (today === null ? '<span class="pill hold">' +
+          (dnum(Date.now()) - latest.d === 1 ? 'Yesterday' : dnum(Date.now()) - latest.d + ' days ago') +
+          '</span>' : '') +
+      '</div></div>';
+
+    /* ---- chart ---- */
+    var today0 = dnum(Date.now());
+    var win = trend.filter(function (p) {
+      return !state.wRange || today0 - p.d < state.wRange;
+    });
+    if (win.length < 2) win = trend.slice(-2);
+    var pts = win.map(function (p) {
+      return { d: p.d, at: p.at, v: disp(p.kg), avg: disp(p.avg) };
+    });
+
+    var RANGES = [[30, '30d'], [90, '90d'], [0, 'All']];
+    var chart = '<div class="card">' +
+      '<div class="between" style="margin-bottom:8px">' +
+        '<p class="lbl" style="margin:0">Trend</p>' +
+        '<div class="seg sm" role="group" aria-label="How much to show">' +
+          RANGES.map(function (r) {
+            return '<button data-act="wrange" data-v="' + r[0] + '" aria-pressed="' +
+              (state.wRange === r[0]) + '">' + r[1] + '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="chart" data-bw=\'' + JSON.stringify(pts.map(function (p) {
+        return [p.at, p.v, p.avg];
+      })) + '\'>' + bwChartSVG(pts, goalDisp, side) + '<div class="tip"></div></div>' +
+      '<div class="clegend">' +
+        '<span><i class="raw"></i> Daily</span>' +
+        '<span><i></i> 7-day average</span>' +
+        (goalDisp !== null ? '<span><i class="goal"></i> Goal ' +
+          (side === 'floor' ? 'floor' : side === 'ceiling' ? 'ceiling' : 'line') + '</span>' : '') +
+      '</div>' +
+    '</div>';
+
+    /* ---- goal ---- */
+    var goalCard;
+    if (state.goalKg === null) {
+      goalCard = '<div class="card">' +
+        '<div class="between"><div><div class="fname">Goal weight</div>' +
+          '<div class="fsub">Not set</div></div>' +
+          '<button class="btn ghost sm" data-act="goal-add">Add a goal</button></div>' +
+        '<p class="hint" style="margin:11px 0 0">It draws a line across the chart and shades ' +
+        'the far side of it — a floor if you are cutting, a ceiling if you are gaining — ' +
+        'so you can see the trend closing on it.</p>' +
+      '</div>';
+    } else {
+      var togo = disp(state.goalKg) - disp(latest.avg);
+      goalCard = '<div class="card">' +
+        '<div class="between"><div><div class="fname">Goal weight</div>' +
+          '<div class="fsub">' + (side === 'at' ? 'Reached — hold it'
+            : (side === 'floor' ? 'Floor' : 'Ceiling') + ' · ' +
+              fmt(Math.abs(Math.round(togo * 10) / 10)) + ' ' + U() + ' to go') +
+          '</div></div>' +
+          stepperHTML('goal', 'goal', fmt(disp(state.goalKg)), U()) + '</div>' +
+        '<button class="btn ghost sm" style="width:100%;margin-top:12px" data-act="goal-clear">Remove the goal</button>' +
+      '</div>';
+    }
+
+    /* ---- tiles ---- */
+    var logged = state.body.length;
+    var tiles = '<div class="tiles">' +
+      tile(fmt(disp(latest.avg)), U(), '7-day avg') +
+      tile(dMonth === null ? '—' : (dMonth > 0 ? '+' : '') + fmt(Math.round(dMonth * 10) / 10),
+        dMonth === null ? '' : U(), 'In 30 days') +
+      tile(logged, logged === 1 ? 'day' : 'days', 'Logged') +
+    '</div>';
+
+    /* ---- the readings themselves ---- */
+    var recent = trend.slice(-14).reverse();
+    var list = '<div class="card">' +
+      '<p class="lbl" style="margin:0 0 6px">Recent readings</p>' +
+      recent.map(function (p, i) {
+        var prev = recent[i + 1];
+        var d = prev ? disp(p.kg) - disp(prev.kg) : null;
+        return '<div class="erow">' +
+          '<span class="ed">' + (p.d === today0 ? '<b>Today</b>' : dayName(p.at)) + '</span>' +
+          '<span class="dl">' + (d === null ? '' :
+            (d > 0.05 ? '+' : '') + (Math.abs(d) < 0.05 ? '±0' : fmt(Math.round(d * 10) / 10))) + '</span>' +
+          '<span class="ev">' + fmt(disp(p.kg)) + '<small>' + U() + '</small></span>' +
+          '<button class="del" data-act="wt-del" data-id="' + dkey(p.at) + '" ' +
+            'aria-label="Delete the reading for ' + dayName(p.at) + '">' + TRASH + '</button>' +
+        '</div>';
+      }).join('') +
+      (trend.length > 14 ? '<p class="hint" style="margin:11px 0 0">Showing the last 14 of ' +
+        trend.length + ' readings. All of them are in your export.</p>' : '') +
+    '</div>';
+
+    return '<div class="body">' + hero + '<div class="pad" style="padding-top:2px">' +
+      entry + chart + goalCard + tiles + list +
+      '</div></div>';
   }
 
   /* ==========================================================================
@@ -1279,8 +1776,9 @@ input,textarea{font:inherit;color:inherit}
         '</div></div><p class="fsub">Weights convert to the nearest one you can actually load.</p></div>' +
 
       '<div class="field"><div class="between"><span class="fname">Bodyweight</span>' +
-        stepperHTML('bw', 'bw', fmt(Math.round(toDisplayWeight(bodyNow() === null ? 75 : bodyNow()) * 2) / 2), U()) +
-        '</div></div>' +
+        stepperHTML('bw', 'bw', fmt(Math.round(toDisplayWeight(bodyNow() === null ? 75 : bodyNow()) * 10) / 10), U()) +
+        '</div><p class="fsub">A quick correction. The day-by-day log lives in the ' +
+        '<strong>Weight</strong> tab.</p></div>' +
 
       '<div class="field"><div class="between"><span class="fname">Height</span>' +
         stepperHTML('ht', 'ht', heightText(), '') + '</div></div>' +
@@ -1322,6 +1820,19 @@ input,textarea{font:inherit;color:inherit}
             stepperHTML('start', id, fmt(state.weights[id]), U()) + '</div>';
         }).join('') +
         '<p class="fsub">Nudge these if the app and the rack disagree.</p></div>' +
+
+      '<div class="field">' +
+        '<p class="fname" style="margin-bottom:2px">Send the recap to</p>' +
+        '<p class="fsub">A WhatsApp number with its country code. The share button on a finished ' +
+        'workout then opens that chat with the whole session already typed out — you still press ' +
+        'send. Leave it empty and you get the normal share sheet instead.</p>' +
+        '<input class="textin" id="waNum" type="tel" inputmode="tel" autocomplete="off" ' +
+          'placeholder="+34 600 123 456" value="' + (state.waNumber || '') + '">' +
+        (waDigits()
+          ? '<p class="fsub">Goes to ' + waPretty() + '. Nothing is sent anywhere until you press ' +
+            'send in WhatsApp yourself.</p>'
+          : '') +
+      '</div>' +
 
       '<div class="field">' +
         '<p class="fname" style="margin-bottom:2px">Backup</p>' +
@@ -1377,6 +1888,7 @@ input,textarea{font:inherit;color:inherit}
       : v === 'summary' ? screenSummary()
       : v === 'calendar' ? screenCalendar()
       : v === 'progress' ? screenProgress()
+      : v === 'weight' ? screenWeight()
       : v === 'guide' ? screenGuide()
       : screenToday();
 
@@ -1388,8 +1900,9 @@ input,textarea{font:inherit;color:inherit}
         : '<button class="iconbtn" data-act="settings" aria-label="Settings">' + GEAR + '</button>') +
       '</header>';
 
-    var TABS = [['today', 'Today'], ['calendar', 'Calendar'], ['progress', 'Progress'], ['guide', 'Guide']];
-    var tabs = (v === 'today' || v === 'calendar' || v === 'progress' || v === 'guide')
+    var TABS = [['today', 'Today'], ['calendar', 'Calendar'], ['progress', 'Progress'],
+      ['weight', 'Weight'], ['guide', 'Guide']];
+    var tabs = TABS.some(function (t) { return t[0] === v; })
       ? '<nav class="tabs">' + TABS.map(function (t) {
           return '<button class="tab" data-act="nav" data-v="' + t[0] + '"' +
             (v === t[0] ? ' aria-current="page"' : '') + '>' + t[1] + '</button>';
@@ -1406,6 +1919,8 @@ input,textarea{font:inherit;color:inherit}
     var nowSheet = app.querySelector('.sheet');
     if (nowSheet && keepSheet) nowSheet.scrollTop = keepSheet;
     wireSparks();
+    wireBwChart();
+    wireInputs();
     wakeApply();
   }
 
@@ -1447,6 +1962,101 @@ input,textarea{font:inherit;color:inherit}
       el.addEventListener('pointerleave', hide);
       el.addEventListener('pointercancel', hide);
     });
+  }
+
+  // Same scales as bwChartSVG, so the crosshair lands on the dot it names.
+  function wireBwChart() {
+    var el = app.querySelector('.chart[data-bw]');
+    if (!el) return;
+    var pts;
+    try { pts = JSON.parse(el.getAttribute('data-bw')); } catch (e) { return; }
+    if (!pts || !pts.length) return;
+
+    var tip = el.querySelector('.tip'), svg = el.querySelector('svg');
+    var xh = svg ? svg.querySelector('.xhair') : null;
+    var W = 300, H = 130, PL = 28, PR = 8, PT = 11, PB = 19;
+
+    var days = pts.map(function (p) { return dnum(p[0]); });
+    var d0 = days[0], d1 = days[days.length - 1];
+    var vals = [];
+    pts.forEach(function (p) { vals.push(p[1]); vals.push(p[2]); });
+    if (state.goalKg !== null) vals.push(Math.round(toDisplayWeight(state.goalKg) * 10) / 10);
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    var pad = (hi - lo) * 0.14 || 1;
+    lo -= pad; hi += pad;
+
+    var xOf = function (d) { return d1 === d0 ? PL + (W - PL - PR) / 2 : PL + ((d - d0) / (d1 - d0)) * (W - PL - PR); };
+    var yOf = function (v) { return PT + (1 - (v - lo) / (hi - lo)) * (H - PT - PB); };
+
+    function show(ev) {
+      var r = el.getBoundingClientRect();
+      if (!r.width) return;
+      var sx = ((ev.clientX - r.left) / r.width) * W;
+      var best = 0, bd = Infinity;
+      days.forEach(function (d, i) {
+        var gap = Math.abs(xOf(d) - sx);
+        if (gap < bd) { bd = gap; best = i; }
+      });
+      var vx = xOf(days[best]);
+      tip.textContent = fmt(pts[best][1]) + U() + '  avg ' + fmt(pts[best][2]) + '  ' + shortDate(pts[best][0]);
+      tip.style.left = Math.min(Math.max(vx / W * r.width, 62), r.width - 62) + 'px';
+      tip.style.top = (yOf(pts[best][2]) / H * r.height) + 'px';
+      tip.classList.add('on');
+      if (xh) { xh.setAttribute('x1', vx); xh.setAttribute('x2', vx); xh.setAttribute('opacity', '0.35'); }
+    }
+    function hide() { tip.classList.remove('on'); if (xh) xh.setAttribute('opacity', '0'); }
+
+    el.addEventListener('pointermove', show);
+    el.addEventListener('pointerdown', show);
+    el.addEventListener('pointerleave', hide);
+    el.addEventListener('pointercancel', hide);
+  }
+
+  // Every render replaces the DOM, so a half-typed number has to be kept in ui and
+  // put back afterwards rather than living in the input.
+  function wireInputs() {
+    var w = document.getElementById('wtIn');
+    if (w) {
+      if (ui.wDraft !== null && ui.wDraft !== undefined) w.value = ui.wDraft;
+      w.addEventListener('input', function () { ui.wDraft = w.value; });
+      w.addEventListener('keydown', function (ev) {
+        if (ev.key !== 'Enter') return;
+        ev.preventDefault();
+        ui.wDraft = w.value;
+        ACT['wt-save']({});
+        save(); render();
+      });
+    }
+    var ta = document.getElementById('importText');
+    if (ta) {
+      if (ui.importDraft) ta.value = ui.importDraft;
+      ta.addEventListener('input', function () { ui.importDraft = ta.value; state.armImport = false; });
+    }
+    var f = document.getElementById('importFile');
+    if (f) {
+      // Read it the moment it is picked — the element itself will not survive to the
+      // confirming tap, but the text it held will.
+      f.addEventListener('change', function () {
+        if (!f.files || !f.files[0]) return;
+        var name = f.files[0].name, fr = new FileReader();
+        fr.onload = function () {
+          ui.importDraft = String(fr.result);
+          state.armImport = false;
+          setStatus('Read ' + name + '. Tap Restore this backup.');
+          render();
+        };
+        fr.onerror = function () { setStatus('Could not read that file.', true); render(); };
+        fr.readAsText(f.files[0]);
+      });
+    }
+    var n = document.getElementById('waNum');
+    if (n) {
+      n.addEventListener('input', function () {
+        // a phone number and nothing else — this string ends up in a URL
+        state.waNumber = n.value.replace(/[^0-9+ ()-]/g, '').slice(0, 24);
+        save();
+      });
+    }
   }
 
   /* ==========================================================================
@@ -1520,7 +2130,12 @@ input,textarea{font:inherit;color:inherit}
       if (typeof base.stalls[id] !== 'number') base.stalls[id] = 0;
     });
     base.setup = true; base.view = 'today'; base.session = null; base.last = null;
-    if (!Array.isArray(base.body)) base.body = [];
+    base.body = Array.isArray(base.body) ? base.body.filter(function (e) {
+      return e && typeof e.at === 'number' && typeof e.kg === 'number' && e.kg > 0;
+    }).sort(function (a, b) { return a.at - b.at; }) : [];
+    if (typeof base.goalKg !== 'number') base.goalKg = null;
+    if (typeof base.wRange !== 'number') base.wRange = 90;
+    if (typeof base.waNumber !== 'string') base.waNumber = '';
     state = base;
     save();
     setStatus('Restored ' + state.history.length + ' session' + (state.history.length === 1 ? '' : 's') + '.');
@@ -1535,6 +2150,7 @@ input,textarea{font:inherit;color:inherit}
 
   function setUnits(u) {
     if (u === state.units) return;
+    ui.wDraft = null;
     var conv = u === 'kg' ? 1 / LB : LB;
     var virgin = !state.history.length;
     state.units = u;
@@ -1542,6 +2158,40 @@ input,textarea{font:inherit;color:inherit}
     ORDER.forEach(function (id) {
       state.weights[id] = virgin ? LIFTS[id].start[u] : Math.max(state.bar, rackable(state.weights[id] * conv));
     });
+  }
+
+  /* ---- the weight tab's draft reading ---- */
+
+  function wDispBounds() { return U() === 'kg' ? [25, 300] : [55, 660]; }
+
+  // Whatever is in the box right now, falling back to today's reading, then the last one.
+  function wtDraftNow() {
+    var el = document.getElementById('wtIn');
+    var v = parseFloat(el ? el.value : ui.wDraft);
+    if (!isFinite(v)) {
+      var t = bodyToday();
+      var kg = t !== null ? t : (bodyNow() === null ? 75 : bodyNow());
+      v = Math.round(toDisplayWeight(kg) * 10) / 10;
+    }
+    return v;
+  }
+  function wtNudge(dir) {
+    var b = wDispBounds(), step = U() === 'kg' ? 0.1 : 0.2;
+    var v = Math.round((wtDraftNow() + dir * step) * 10) / 10;
+    ui.wDraft = fmt(Math.max(b[0], Math.min(b[1], v)));
+  }
+  function goalNudge(dir) {
+    if (state.goalKg === null) return;
+    var b = wDispBounds(), step = U() === 'kg' ? 0.5 : 1;
+    var v = Math.round(toDisplayWeight(state.goalKg) * 10) / 10 + dir * step;
+    v = Math.max(b[0], Math.min(b[1], v));
+    state.goalKg = Math.round(fromDisplayWeight(v) * 10) / 10;
+  }
+
+  // Which session a share button is pointing at.
+  function recByKey(key) {
+    var rec = byDay()[key];
+    return rec || state.last;
   }
 
   var EXPERIENCED = {
@@ -1573,6 +2223,36 @@ input,textarea{font:inherit;color:inherit}
       logBody(Math.max(fromDisplayWeight(U() === 'kg' ? 30 : 66), fromDisplayWeight(next)));
     },
     'ht-up': function () { state.heightCm = Math.min(230, state.heightCm + (U() === 'kg' ? 1 : 2.54)); },
+
+    /* ---- weight tab ---- */
+    'wt-up': function () { wtNudge(1); },
+    'wt-down': function () { wtNudge(-1); },
+    'wt-save': function () {
+      var v = wtDraftNow(), b = wDispBounds();
+      if (!(v >= b[0] && v <= b[1])) {
+        setStatus('A weight between ' + b[0] + ' and ' + b[1] + ' ' + U() + ', please.', true);
+        return;
+      }
+      logBody(fromDisplayWeight(v));
+      ui.wDraft = null;
+      setStatus('Logged ' + fmt(Math.round(v * 10) / 10) + ' ' + U() + ' for today.');
+    },
+    'wt-del': function (d) { dropBody(d.id); ui.wDraft = null; },
+    wrange: function (d) { state.wRange = +d.v; },
+    'goal-add': function () {
+      var t = bodyTrend();
+      var base = t.length ? t[t.length - 1].avg : (bodyNow() === null ? 75 : bodyNow());
+      // land on something round in the units on screen, not a converted 74.84
+      state.goalKg = Math.round(fromDisplayWeight(Math.round(toDisplayWeight(base) * 2) / 2) * 10) / 10;
+    },
+    'goal-clear': function () { state.goalKg = null; },
+    'goal-up': function () { goalNudge(1); },
+    'goal-down': function () { goalNudge(-1); },
+
+    /* ---- sharing ---- */
+    share: function (d) { shareRecap(recByKey(d.id)); },
+    'copy-recap': function (d) { copyRecap(recByKey(d.id)); },
+
     'ht-down': function () { state.heightCm = Math.max(120, state.heightCm - (U() === 'kg' ? 1 : 2.54)); },
 
     'start-up': function (d) { state.weights[d.id] = rackable(state.weights[d.id] + smallest() * 2); },
@@ -1614,7 +2294,7 @@ input,textarea{font:inherit;color:inherit}
     leave: function () { state.view = 'today'; stopRest(); },
 
     /* ---- nav ---- */
-    nav: function (d) { state.view = d.v; },
+    nav: function (d) { state.view = d.v; ui.wDraft = null; },
     'go-today': function () { state.view = 'today'; },
     'go-calendar': function () { state.view = 'calendar'; state.calMonth = null; },
     table: function () { state.showTable = !state.showTable; },
@@ -1633,7 +2313,8 @@ input,textarea{font:inherit;color:inherit}
     settings: function () { ui.sheet = true; setStatus(''); },
     restore: function () { ui.sheet = true; ui.importOpen = true; setStatus(''); },
     'close-sheet': function () {
-      ui.sheet = false; ui.importOpen = false; state.armReset = false; state.armImport = false; setStatus('');
+      ui.sheet = false; ui.importOpen = false; ui.importDraft = '';
+      state.armReset = false; state.armImport = false; setStatus('');
     },
     'bar-up': function () { state.bar = state.bar + (U() === 'kg' ? 2.5 : 5); },
     'bar-down': function () { state.bar = Math.max(U() === 'kg' ? 5 : 10, state.bar - (U() === 'kg' ? 2.5 : 5)); },
@@ -1650,48 +2331,39 @@ input,textarea{font:inherit;color:inherit}
 
     export: function () { doExport(); },
     copy: function () { doCopy(); },
-    'import-open': function () { ui.importOpen = !ui.importOpen; state.armImport = false; setStatus(''); },
+    'import-open': function () {
+      ui.importOpen = !ui.importOpen; ui.importDraft = ''; state.armImport = false; setStatus('');
+    },
     'import-run': function () {
       var ta = document.getElementById('importText');
-      var fileEl = document.getElementById('importFile');
-      var text = ta && ta.value.trim();
-
-      var finish = function (payload) {
-        if (!state.armImport) {
-          state.armImport = true;
-          setStatus('This replaces your current log.');
-          render();
-          return;
-        }
-        state.armImport = false;
-        if (applyBackup(payload)) { ui.importOpen = false; }
-        render();
-      };
-
-      if (!text && fileEl && fileEl.files && fileEl.files[0]) {
-        var fr = new FileReader();
-        fr.onload = function () { finish(String(fr.result)); };
-        fr.onerror = function () { setStatus('Could not read that file.', true); render(); };
-        fr.readAsText(fileEl.files[0]);
+      var text = ((ta && ta.value) || ui.importDraft || '').trim();
+      if (!text) { setStatus('Choose a file or paste a backup first.', true); return; }
+      if (!state.armImport) {
+        state.armImport = true;
+        ui.importDraft = text;
+        setStatus('This replaces your current log.');
         return;
       }
-      if (!text) { setStatus('Choose a file or paste a backup first.', true); return; }
-      finish(text);
+      state.armImport = false;
+      if (applyBackup(text)) { ui.importOpen = false; ui.importDraft = ''; }
     },
 
     reset: function () {
       if (!state.armReset) { state.armReset = true; return; }
       var keep = { units: state.units, theme: state.theme, heightCm: state.heightCm,
-        restNormal: state.restNormal, restFail: state.restFail, bar: state.bar, body: state.body };
+        restNormal: state.restNormal, restFail: state.restFail, bar: state.bar, body: state.body,
+        goalKg: state.goalKg, waNumber: state.waNumber };
       state = freshState(keep.units);
       state.theme = keep.theme; state.heightCm = keep.heightCm; state.body = keep.body;
       state.restNormal = keep.restNormal; state.restFail = keep.restFail; state.bar = keep.bar;
+      state.goalKg = keep.goalKg; state.waNumber = keep.waNumber;
       state.view = 'setup'; state.step = 0;
       ui.sheet = false;
     }
   };
 
-  var KEEP_STATUS = { export: 1, copy: 1, 'import-run': 1, 'import-open': 1 };
+  var KEEP_STATUS = { export: 1, copy: 1, 'import-run': 1, 'import-open': 1,
+    'wt-save': 1, share: 1, 'copy-recap': 1 };
 
   app.addEventListener('click', function (ev) {
     var el = ev.target.closest('[data-act]');
@@ -1741,6 +2413,11 @@ input,textarea{font:inherit;color:inherit}
      21. Boot
      ========================================================================== */
 
+  var VIEWS = { today: 1, calendar: 1, progress: 1, weight: 1, guide: 1, workout: 1, summary: 1 };
+  if (!VIEWS[state.view]) state.view = 'today';
+  if (typeof state.wRange !== 'number') state.wRange = 90;
+  if (state.goalKg === undefined) state.goalKg = null;
+  if (!Array.isArray(state.body)) state.body = [];
   if (state.view === 'summary' && !state.last) state.view = 'today';
   if (state.view === 'workout' && !state.session) state.view = 'today';
   if (!state.setup) { state.view = 'setup'; if (typeof state.step !== 'number') state.step = 0; }

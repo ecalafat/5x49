@@ -25,7 +25,23 @@ and it repeats. Miss three sessions in a row on one lift and it deloads 10%, rou
 a weight you can actually load.
 
 The app picks the weights, shows which plates go on each side of the bar, times the
-rest, draws a training calendar and tracks bodyweight. Metric by default.
+rest and draws a training calendar. Metric by default.
+
+## Weight
+
+One reading a day in the **Weight** tab. The chart shows every daily reading plus the
+**7-day average** — the daily number is mostly water, the average is the trend. Set a
+goal weight and it becomes a dashed floor or ceiling across the chart.
+
+Weigh yourself at the same time every day, ideally right after waking up and going to
+the bathroom, before eating or drinking.
+
+## Sharing a recap
+
+Finishing a workout offers **Share the recap**: every lift, every set, the weight on the
+bar and the tonnage as plain text, ready for WhatsApp. Save a number under
+**Settings → Send the recap to** to skip straight to that chat. Nothing leaves the phone
+until you press send yourself.
 
 ## Backups
 
