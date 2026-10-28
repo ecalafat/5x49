@@ -1,5 +1,5 @@
 /* 5x4.9 service worker — cache everything, serve from cache, no network needed. */
-var CACHE = '5x49-v4';
+var CACHE = '5x49-v5';
 var ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './icon-180.png', './icon-192.png', './icon-512.png', './icon-512-maskable.png', './favicon-32.png'

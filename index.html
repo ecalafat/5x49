@@ -555,7 +555,9 @@ input,textarea{font:inherit;color:inherit}
   // What happens to this lift's weight next time, given how the session went.
   function verdict(entry) {
     if (cleared(entry)) return { kind: 'up', weight: rackable(entry.weight + inc(entry.id)) };
-    var stalls = (state.stalls[entry.id] || 0) + 1;
+    // Taking weight off by hand is already a deload — the miss count starts again from there.
+    var lowered = entry.planned !== undefined && entry.weight < entry.planned;
+    var stalls = (lowered ? 0 : state.stalls[entry.id] || 0) + 1;
     if (stalls >= 3) return { kind: 'down', weight: Math.max(state.bar, rackable(entry.weight * 0.9)) };
     return { kind: 'hold', weight: entry.weight, stalls: stalls };
   }
@@ -564,7 +566,8 @@ input,textarea{font:inherit;color:inherit}
     return {
       workout: letter, at: Date.now(),
       lifts: PLAN[letter].map(function (id) {
-        return { id: id, weight: state.weights[id], sets: new Array(LIFTS[id].sets).fill(null), warm: false };
+        return { id: id, weight: state.weights[id], planned: state.weights[id],
+          sets: new Array(LIFTS[id].sets).fill(null), warm: false };
       })
     };
   }
@@ -1105,7 +1108,13 @@ input,textarea{font:inherit;color:inherit}
             '<div class="sc">' + L.sets + ' sets &times; ' + L.reps + ' reps</div></div>' +
           '<div class="wbig">' + fmt(e.weight) + '<small>' + U() + '</small></div>' +
         '</div>' +
-        '<div class="wmid">' + platesHTML(e.weight) + '</div>' +
+        '<div class="wmid">' + platesHTML(e.weight) +
+          '<div class="between" style="margin-top:10px">' +
+            '<span class="hint" style="margin:0">' + (e.planned !== undefined && e.weight !== e.planned
+              ? 'Planned ' + fmt(e.planned) + U() + ' &middot; logging what you load'
+              : 'Loading something else? Change it') + '</span>' +
+            stepperHTML('sw', i, fmt(e.weight), U()) +
+          '</div></div>' +
         '<div class="sets" data-n="' + e.sets.length + '">' +
           e.sets.map(function (r, j) {
             var st = r === null ? 'none' : r >= L.reps ? 'full' : r === 0 ? 'fail' : 'part';
@@ -2281,6 +2290,10 @@ input,textarea{font:inherit;color:inherit}
       if (next !== null) startRest(next >= target ? state.restNormal : state.restFail);
       else stopRest();
     },
+    // This session's weight only. Whatever is on the bar is what gets logged and what
+    // the next session is worked out from.
+    'sw-up': function (d) { var e = state.session.lifts[+d.id]; e.weight = rackable(e.weight + smallest() * 2); },
+    'sw-down': function (d) { var e = state.session.lifts[+d.id]; e.weight = Math.max(state.bar, rackable(e.weight - smallest() * 2)); },
     warm: function (d) { var e = state.session.lifts[+d.i]; e.warm = !e.warm; },
     skiprest: function () { stopRest(); },
     done: function () {
