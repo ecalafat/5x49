@@ -1270,16 +1270,30 @@ input,textarea{font:inherit;color:inherit}
 
     var detail = '';
     if (picked) {
+      // Weights logged in the other unit would not snap to anything loadable, so leave those be.
+      var editable = (picked.units || U()) === U();
+      var editing = editable && ui.calEdit === state.calPick;
       detail = '<div class="card">' +
         '<div class="between" style="margin-bottom:10px">' +
           '<p class="lbl" style="margin:0">' + longDate(picked.at) + '</p>' +
           '<span class="pill">Workout ' + picked.workout + '</span></div>' +
-        picked.lifts.map(function (e) {
+        picked.lifts.map(function (e, i) {
           return '<div class="liftrow">' +
             '<div><div class="nm">' + LIFTS[e.id].name + '</div>' +
               '<div class="sc">' + e.sets.map(function (r) { return r === null ? '-' : r; }).join(' / ') + '</div></div>' +
-            '<div class="wt">' + fmt(e.weight) + '<small>' + picked.units + '</small></div></div>';
+            (editing
+              ? stepperHTML('hw', state.calPick + '|' + i, fmt(e.weight), U())
+              : '<div class="wt">' + fmt(e.weight) + '<small>' + picked.units + '</small></div>') +
+            '</div>';
         }).join('') +
+        (editing
+          ? '<p class="hint" style="margin:10px 0 0">Set what was really on the bar. If this is the latest ' +
+            'session for a lift, its next weight moves with it.</p>'
+          : '') +
+        (editable
+          ? '<button class="btn ghost sm" style="width:100%;margin-top:12px" data-act="cal-edit">' +
+            (editing ? 'Done editing' : 'Fix the weights') + '</button>'
+          : '') +
         '<button class="btn ghost sm" style="width:100%;margin-top:12px" data-act="share" ' +
           'data-id="' + state.calPick + '">' + SHARE + 'Share this one</button>' +
         (ui.status ? '<p class="status' + (ui.statusErr ? ' err' : '') +
@@ -2208,6 +2222,27 @@ input,textarea{font:inherit;color:inherit}
     lb: { squat: 95, bench: 65, row: 75, ohp: 55, deadlift: 115 }
   };
 
+  // Correct the weight on a logged session. When it is the newest session for that lift,
+  // the next weight is worked out again from the corrected one, the same way it was the first time.
+  function fixLogged(ref, dir) {
+    var p = String(ref).split('|'), rec = byDay()[p[0]];
+    var e = rec && rec.lifts[+p[1]];
+    if (!e) return;
+    e.weight = dir > 0 ? rackable(e.weight + smallest() * 2)
+      : Math.max(state.bar, rackable(e.weight - smallest() * 2));
+    e.nextWeight = e.kind === 'up' ? rackable(e.weight + inc(e.id))
+      : e.kind === 'down' ? Math.max(state.bar, rackable(e.weight * 0.9))
+      : e.weight;
+
+    var newest = null;
+    state.history.forEach(function (r) {
+      if (r.lifts.some(function (x) { return x.id === e.id; })) newest = r;
+    });
+    if (newest === rec) state.weights[e.id] = e.nextWeight;
+
+    if (state.last && state.last.at === rec.at) state.last = rec;
+  }
+
   var ACT = {
     /* ---- setup wizard ---- */
     units: function (d) { setUnits(d.v); },
@@ -2320,7 +2355,10 @@ input,textarea{font:inherit;color:inherit}
       state.calMonth = monthKey(dt);
       state.calPick = null;
     },
-    pick: function (d) { state.calPick = state.calPick === d.id ? null : d.id; },
+    pick: function (d) { state.calPick = state.calPick === d.id ? null : d.id; ui.calEdit = null; },
+    'cal-edit': function () { ui.calEdit = ui.calEdit === state.calPick ? null : state.calPick; },
+    'hw-up': function (d) { fixLogged(d.id, 1); },
+    'hw-down': function (d) { fixLogged(d.id, -1); },
 
     /* ---- settings ---- */
     settings: function () { ui.sheet = true; setStatus(''); },
